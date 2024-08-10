@@ -7,6 +7,7 @@ from typing import (
     List,
     TypeVar
 )
+import os
 
 
 class Auth:
@@ -56,3 +57,24 @@ class Auth:
         Returns a User instance from information from a request object
         """
         return None
+
+   def session_cookie(self, request=None):
+    """
+    Returns the value of the session cookie from the request.
+    
+    Return None if request is None.
+    Return the value of the cookie named _my_session_id from request.
+    The name of the cookie must be defined by the environment variable SESSION_NAME.
+    """
+    if request is None:
+        return None
+    
+    session_name = os.getenv('SESSION_NAME')
+    if session_name is None:
+        return None
+    
+    _my_session_id = request.cookies.get(session_name)
+    if _my_session_id is None:
+        return None
+    
+    return _my_session_id
