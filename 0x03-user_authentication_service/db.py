@@ -1,8 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import InvalidRequestError, NoResultFound
 
 from user import User
 
@@ -34,12 +33,24 @@ class DB:
 
     def find_user_by(self, **kwargs) -> User:
         """Find a user by arbitrary keyword arguments."""
-        try:
+        for key in kwargs.keys():
+            if not hasattr(User, key):
+                raise InvalidRequestError()
+
             user = self._session.query(User).filter_by(**kwargs).first()
-            if user is None:
-                raise NoResultFound
-            return user
-        except InvalidRequestError:
-            raise InvalidRequestError
-        except NoResultFound:
-            raise NoResultFound
+            if user:
+                return user
+            raise NoResultFound()
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """
+        
+        """
+        user_to_update = self.find_user_by(id=user_id)
+        
+        for attr, value in kwargs.items():
+            if hasattr(User, attr):
+                set_attr(user_to_update, attr, value)
+            else:
+                raise ValueError()
+        self.__session.commit()
+    
